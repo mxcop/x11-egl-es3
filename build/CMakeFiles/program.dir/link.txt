@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/program.dir/src/main.cpp.o -o program  -lX11 lib/glad/libglad.a 

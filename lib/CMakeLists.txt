@@ -15,3 +15,7 @@ target_link_libraries(program X11)
 # Glad (OpenGL (ES))
 add_subdirectory("glad")
 target_link_libraries(program glad)
+
+target_link_libraries(program EGL)
+target_link_libraries(program GLESv2)
+target_link_libraries(program m)

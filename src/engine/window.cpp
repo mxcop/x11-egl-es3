@@ -26,13 +26,18 @@ int GameWindow::init(int w, int h, const char* title) {
     return 1;
 }
 
-int GameWindow::vsync(bool yes) { return egl_vsync(egl_display, yes); }
+int GameWindow::vsync(bool yes) {
+    if (open == false) return 0;
+    return egl_vsync(egl_display, yes); 
+}
 
 void GameWindow::swap_buffers() const {
+    if (open == false) return;
     eglSwapBuffers(egl_display, egl_surface);
 }
 
 void GameWindow::size(int& w, int& h) const {
+    if (open == false) return;
     XWindowAttributes gwa;
     XGetWindowAttributes(x_display, x_win, &gwa);
 
@@ -41,6 +46,7 @@ void GameWindow::size(int& w, int& h) const {
 }
 
 GameWindow::~GameWindow() {
+    if (x_display == nullptr) return;
     egl_clean(egl_display, egl_context, egl_surface);
     x11_clean(x_display, x_win);
 }

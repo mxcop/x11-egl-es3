@@ -11,6 +11,13 @@ set_target_properties(program PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 # Includes
 target_include_directories(program PRIVATE "./src/")
 
+# Shared libraries
+target_link_libraries(program 
+    X11    # Window Compositor API
+    EGL    # Context API
+    GLESv2 # OpenGL ES API
+)
+
 # Sub-directories
 add_subdirectory("src")
 add_subdirectory("lib")

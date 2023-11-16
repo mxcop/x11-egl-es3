@@ -1,0 +1,56 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 15
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}"
+        },
+        {
+            "name": "debug",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            },
+            "environment": {
+                "_DEBUG": "1"
+            }
+        },
+        {
+            "name": "release",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "inherits": ["default"],
+            "name": "linux",
+            "hidden": true,
+            "generator": "Unix Makefiles",
+            "environment": {
+                "LINUX": "1"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "inherits": ["linux", "debug"],
+            "name": "linux-debug",
+            "displayName": "Debug"
+        },
+        {
+            "inherits": ["linux", "release"],
+            "name": "linux-release",
+            "displayName": "Release"
+        }
+    ]
+}

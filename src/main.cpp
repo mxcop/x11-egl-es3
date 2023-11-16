@@ -1,147 +1,209 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <cstdarg>
 
 #include <X11/Xlib.h>
-#include <glad/egl.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
 
-void error_fatal(const char* format, ...) {
-    printf("error: ");
+#include <GLES2/gl2.h>
+#include <EGL/egl.h>
 
-    va_list va;
-    va_start(va, format);
-    vprintf(format, va);
-    va_end(va);
+/* Set to '0' to disable v-sync */
+#define VSYNC 1
 
-    printf("\n");
-    exit(1);
+/**
+ * @brief Initialize an X11 window.
+ */
+Window init_x11_window(Display* display, int x, int y, int w, int h,
+                       const char* title) {
+    /* Get root window (usually whole screen) */
+    Window root_win = DefaultRootWindow(display);
+
+    XSetWindowAttributes swa;
+    swa.event_mask = ExposureMask | ButtonPressMask | KeyPressMask;
+
+    /* Create our window */
+    Window x_win =
+        XCreateWindow(display, root_win, 0, 0, 800, 600, 0, CopyFromParent,
+                      InputOutput, CopyFromParent, CWEventMask, &swa);
+
+    /* Update window title */
+    XStoreName(display, x_win, title);
+
+    /* Window hints */
+    XWMHints hints;
+    hints.input = True;
+    hints.flags = InputHint;
+    XSetWMHints(display, x_win, &hints);
+
+    /* Show the window */
+    XMapWindow(display, x_win);
+    return x_win;
 }
 
-const EGLint egl_config_attribs[] = {
-    EGL_COLOR_BUFFER_TYPE,     EGL_RGB_BUFFER,
-    EGL_BUFFER_SIZE,           32,
-    EGL_RED_SIZE,              8,
-    EGL_GREEN_SIZE,            8,
-    EGL_BLUE_SIZE,             8,
-    EGL_ALPHA_SIZE,            8,
-
-    EGL_DEPTH_SIZE,            24,
-    EGL_STENCIL_SIZE,          8,
-
-    EGL_SAMPLE_BUFFERS,        0,
-    EGL_SAMPLES,               0,
-
-    EGL_SURFACE_TYPE,          EGL_WINDOW_BIT,
-    EGL_RENDERABLE_TYPE,       EGL_OPENGL_ES2_BIT,
-
-    EGL_NONE,
-};
-
-const EGLint egl_context_attribs[] = {
-    EGL_CONTEXT_CLIENT_VERSION, 2,
-    EGL_NONE,
-};
-
-const EGLint egl_surface_attribs[] = {
-    EGL_RENDER_BUFFER, EGL_BACK_BUFFER,
-    EGL_NONE,
-};
-
-void setup_egl(EGLint api, EGLNativeDisplayType native_display,
-               EGLNativeWindowType native_window, EGLDisplay* out_display,
-               EGLConfig* out_config, EGLContext* out_context,
-               EGLSurface* out_window_surface) {
-    EGLint ignore;
-    EGLint major = 1, minor = 4;
-    EGLBoolean ok;
-
-    ok = eglBindAPI(api);
-    if (!ok) error_fatal("eglBindAPI(0x%x) failed", api);
-
-    EGLDisplay display = eglGetDisplay(native_display);
-    if (display == EGL_NO_DISPLAY) error_fatal("eglGetDisplay() failed");
-    
-    ok = eglInitialize(display, &major, &minor);
-    if (!ok) error_fatal("eglInitialize() failed");
-
-    EGLint configs_size = 256;
-    EGLConfig* configs = new EGLConfig[configs_size];
-    EGLint num_configs;
-    ok = eglChooseConfig(display, egl_config_attribs, configs,
-                         configs_size,   // num requested configs
-                         &num_configs);  // num returned configs
-    if (!ok) error_fatal("eglChooseConfig() failed");
-    if (num_configs == 0) error_fatal("failed to find suitable EGLConfig");
-    EGLConfig config = configs[0];
-    delete[] configs;
-
-    EGLContext context =
-        eglCreateContext(display, config, EGL_NO_CONTEXT, egl_context_attribs);
-    if (!context) error_fatal("eglCreateContext() failed");
-
-    EGLSurface surface = eglCreateWindowSurface(display, config, native_window,
-                                                egl_surface_attribs);
-    if (!surface) error_fatal("eglCreateWindowSurface() failed");
-
-    ok = eglMakeCurrent(display, surface, surface, context);
-    if (!ok) error_fatal("eglMakeCurrent() failed");
-
-    // Check if surface is double buffered.
-    EGLint render_buffer;
-    ok = eglQueryContext(display, context, EGL_RENDER_BUFFER, &render_buffer);
-    if (!ok) error_fatal("eglQueyContext(EGL_RENDER_BUFFER) failed");
-    if (render_buffer == EGL_SINGLE_BUFFER)
-        printf("warn: EGL surface is single buffered\n");
-
-    *out_display = display;
-    *out_config = config;
-    *out_context = context;
-    *out_window_surface = surface;
+/**
+ * @brief Properly cleanup X11 resources.
+ */
+void cleanup_x11(Display* d, Window& win) {
+    XDestroyWindow(d, win);
+    XCloseDisplay(d);
 }
 
-int main(void) {
-    Display* x_display;
-    Window x_window;
-    XEvent e;
-    const char* msg = "Hello, World!";
-    int s;
+/**
+ * @brief (Attempt) to initialize the EGL context.
+ */
+int init_egl_ctx(Display* display, Window& window, EGLDisplay& out_egl_display,
+                 EGLSurface& out_egl_surface, EGLContext& out_egl_context) {
+    /* Shorter names */
+    EGLDisplay& egl_display = out_egl_display;
+    EGLSurface& egl_surface = out_egl_surface;
+    EGLContext& egl_context = out_egl_context;
 
-    x_display = XOpenDisplay(NULL);
+    egl_display = eglGetDisplay((EGLNativeDisplayType)display);
+    if (egl_display == EGL_NO_DISPLAY) {
+        printf("Got no EGL display.\n");
+        return 1;
+    }
+
+    EGLint egl_version_major, egl_version_minor;
+    if (!eglInitialize(egl_display, &egl_version_major, &egl_version_minor)) {
+        printf("Unable to initialize EGL.\n");
+        return 1;
+    }
+    printf("Initialized EGL version %d.%d\n", egl_version_major,
+           egl_version_minor);
+
+    EGLint egl_config_constraints[] = {EGL_RED_SIZE,
+                                       8,
+                                       EGL_GREEN_SIZE,
+                                       8,
+                                       EGL_BLUE_SIZE,
+                                       8,
+                                       EGL_ALPHA_SIZE,
+                                       0,
+                                       EGL_RENDERABLE_TYPE,
+                                       EGL_OPENGL_ES3_BIT,
+                                       EGL_CONFIG_CAVEAT,
+                                       EGL_NONE,
+                                       EGL_NONE};
+
+    EGLConfig egl_conf;
+    EGLint num_config;
+    if (!eglChooseConfig(egl_display, egl_config_constraints, &egl_conf, 1,
+                         &num_config)) {
+        printf("Failed to choose config. (%d)\n", eglGetError());
+        return 1;
+    }
+
+    if (num_config != 1) {
+        printf("Got %d configs...\n", num_config);
+        return 1;
+    }
+
+    egl_surface = eglCreateWindowSurface(egl_display, egl_conf, window, NULL);
+    if (egl_surface == EGL_NO_SURFACE) {
+        printf("Unable to create EGL surface. (%d)\n", eglGetError());
+        return 1;
+    }
+
+    EGLint ctxattr[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
+    egl_context =
+        eglCreateContext(egl_display, egl_conf, EGL_NO_CONTEXT, ctxattr);
+    if (egl_context == EGL_NO_CONTEXT) {
+        printf("Unable to create EGL context. (%d)\n", eglGetError());
+        return 1;
+    }
+
+    eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context);
+
+    /* Print some info */
+#ifdef _DEBUG
+    printf("EGL Client APIs: %s\n",
+           eglQueryString(egl_display, EGL_CLIENT_APIS));
+    printf("EGL Vendor: %s\n", eglQueryString(egl_display, EGL_VENDOR));
+    printf("EGL Version: %s\n", eglQueryString(egl_display, EGL_VERSION));
+    printf("EGL Extensions: %s\n", eglQueryString(egl_display, EGL_EXTENSIONS));
+#endif
+
+    {
+        EGLint queried_buffer;
+        if (!eglQueryContext(egl_display, egl_context, EGL_RENDER_BUFFER,
+                             &queried_buffer)) {
+            printf("Warn: Failed to query EGL_RENDER_BUFFER: %d\n",
+                   eglGetError());
+        }
+    }
+
+#if VSYNC
+    /* V-sync */
+    if (!eglSwapInterval(egl_display, 1)) {
+        printf("Warn: eglSwapInterval failed: %d\n", eglGetError());
+    }
+#endif
+    return 0;
+}
+
+/**
+ * @brief Properly cleanup EGL resources.
+ */
+void cleanup_egl(EGLDisplay& d, EGLContext& ctx, EGLSurface& srf) {
+    eglMakeCurrent(d, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    eglDestroyContext(d, ctx);
+    eglDestroySurface(d, srf);
+    eglTerminate(d);
+}
+
+int main(int argc, char** argv) {
+    /* Get X11 display */
+    Display* x_display = XOpenDisplay(NULL);
     if (x_display == NULL) {
-        fprintf(stderr, "Cannot open display\n");
-        exit(1);
+        printf("Cannot connect to X server.\n");
+        return 1;
     }
 
-    s = DefaultScreen(x_display);
-    x_window = XCreateSimpleWindow(x_display, RootWindow(x_display, s), 10, 10, 100, 100, 1,
-                            BlackPixel(x_display, s), WhitePixel(x_display, s));
-    XSelectInput(x_display, x_window, ExposureMask | KeyPressMask);
-    XMapWindow(x_display, x_window);
+    Window x_win = init_x11_window(x_display, 0, 0, 800, 600, "Hello, world!");
 
-    EGLDisplay e_display = eglGetDisplay(x_display);
+    /* Register interest in window close events */
+    Atom wm_delmsg = XInternAtom(x_display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(x_display, x_win, &wm_delmsg, 1);
 
-    // EGLDisplay egl_display;
-    // EGLConfig egl_config;
-    // EGLContext egl_context;
-    // EGLSurface egl_surface;
-    // setup_egl(EGL_OPENGL_ES_API,
-    //           x_display,
-    //           x_window,
-    //           &egl_display,
-    //           &egl_config,
-    //           &egl_context,
-    //           &egl_surface);
-
-    while (1) {
-        XNextEvent(x_display, &e);
-        // if (e.type == Expose) {
-        //     XFillRectangle(x_display, w, DefaultGC(d, s), 20, 20, 10, 10);
-        //     XDrawString(d, w, DefaultGC(d, s), 10, 50, msg, strlen(msg));
-        // }
-        if (e.type == KeyPress) break;
+    /* Initialize the EGL context */
+    EGLDisplay egl_display;
+    EGLSurface egl_surface;
+    EGLContext egl_context;
+    if (init_egl_ctx(x_display, x_win, egl_display, egl_surface, egl_context)) {
+        printf("Error creating EGL context.\n");
+        return 1;
     }
 
-    XCloseDisplay(x_display);
+    { /* Set viewport dimension */
+        XWindowAttributes gwa;
+        XGetWindowAttributes(x_display, x_win, &gwa);
+        glViewport(0, 0, gwa.width, gwa.height);
+    }
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    /* Program loop */
+    for (XEvent x_ev;;) {
+        XNextEvent(x_display, &x_ev);
+
+        /* Exit loop if window is closed */
+        if (x_ev.type == ClientMessage &&
+            x_ev.xclient.data.l[0] == wm_delmsg) {
+            printf("Window was closed.\n");
+            break;
+        }
+
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        /* Do stuff here :) */
+
+        eglSwapBuffers(egl_display, egl_surface);
+    }
+
+    /* Cleanup */
+    cleanup_egl(egl_display, egl_context, egl_surface);
+    cleanup_x11(x_display, x_win);
+
     return 0;
 }

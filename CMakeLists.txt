@@ -12,8 +12,8 @@ set_target_properties(main PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 target_compile_definitions(main PRIVATE "DEBUG=$<CONFIG:Debug>")
 
 # Includes
-target_include_directories(main PRIVATE "./src/" "./src/engine/")
-target_precompile_headers(main PRIVATE "./src/engine/libs.h")
+target_include_directories(main PRIVATE "./inc/" "./src/" "./src/engine/")
+target_precompile_headers(main PRIVATE "./inc/libs.h")
 
 # Shared libraries
 target_link_libraries(main 

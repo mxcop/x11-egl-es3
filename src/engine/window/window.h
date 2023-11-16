@@ -16,16 +16,11 @@ struct GameWindow {
     bool open = false;
 
     GameWindow() = default;
+    ~GameWindow();
 
     /* Cannot be copied (could cause a dangling pointer/handle(s)) */
     GameWindow(const GameWindow&) = delete;
     GameWindow& operator=(const GameWindow&) = delete;
-
-    /* Can be moved */
-    GameWindow(GameWindow&&) = default;
-    GameWindow& operator=(GameWindow&&) = default;
-
-    ~GameWindow();
 
     int init(int w, int h, const char* title);
     int vsync(bool yes);

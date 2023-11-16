@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility> /* std::exchange */
+
 /**
  * @brief Shader interface.
  */
@@ -20,8 +22,11 @@ struct Shader {
     Shader& operator=(const Shader&) = delete;
 
     /* Can be moved */
-    Shader(Shader&&) = default;
-    Shader& operator=(Shader&&) = default;
+    Shader(Shader&& o) noexcept : handle(std::exchange(o.handle, 0)){};
+    Shader& operator=(Shader&& o) noexcept {
+        handle = std::exchange(o.handle, 0);
+        return *this;
+    };
 
     /**
      * @brief Load a vertex and fragment shader from filesystem.

@@ -17,7 +17,7 @@ struct GameWindow {
 
     GameWindow() = default;
 
-    /* Cannot be copied (because it's resources cannot be copied) */
+    /* Cannot be copied (could cause a dangling pointer/handle(s)) */
     GameWindow(const GameWindow&) = delete;
     GameWindow& operator=(const GameWindow&) = delete;
 

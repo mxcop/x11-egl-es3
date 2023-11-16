@@ -15,8 +15,7 @@ struct Shader {
     Shader(const char* vert_src, const char* frag_src);
     ~Shader();
 
-    /* Cannot be copied (because there's no reference counting for the shader
-     * object) */
+    /* Cannot be copied (could cause dangling handle) */
     Shader(const Shader&) = delete;
     Shader& operator=(const Shader&) = delete;
 

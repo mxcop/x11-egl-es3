@@ -116,12 +116,12 @@ int init_egl_ctx(Display* display, Window& window, EGLDisplay& out_egl_display,
     eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context);
 
     /* Print some info */
-#ifdef _DEBUG
-    printf("EGL Client APIs: %s\n",
+#ifdef DEBUG
+    printf("EGL > Client APIs: %s\n",
            eglQueryString(egl_display, EGL_CLIENT_APIS));
-    printf("EGL Vendor: %s\n", eglQueryString(egl_display, EGL_VENDOR));
-    printf("EGL Version: %s\n", eglQueryString(egl_display, EGL_VERSION));
-    printf("EGL Extensions: %s\n", eglQueryString(egl_display, EGL_EXTENSIONS));
+    printf("EGL >      Vendor: %s\n", eglQueryString(egl_display, EGL_VENDOR));
+    printf("EGL >     Version: %s\n", eglQueryString(egl_display, EGL_VERSION));
+    // printf("EGL - Extensions: \n%s\n", eglQueryString(egl_display, EGL_EXTENSIONS));
 #endif
 
     {

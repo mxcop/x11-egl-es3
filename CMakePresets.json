@@ -15,10 +15,11 @@
             "name": "debug",
             "hidden": true,
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "DEBUG": "TRUE"
             },
             "environment": {
-                "_DEBUG": "1"
+                "DEBUG": "1"
             }
         },
         {

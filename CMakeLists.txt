@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD 17 CACHE STRING "" FORCE)
 add_executable(program)
 set_target_properties(program PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 
+# Add DEBUG compiler macro
+target_compile_definitions(program PRIVATE "DEBUG=$<CONFIG:Debug>")
+
 # Includes
 target_include_directories(program PRIVATE "./src/")
 

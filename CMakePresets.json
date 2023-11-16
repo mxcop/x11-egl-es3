@@ -9,14 +9,18 @@
             "name": "default",
             "hidden": true,
             "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/install/${presetName}"
+            "installDir": "${sourceDir}/install/${presetName}",
+            "vendor": {
+              "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+                "sourceDir": "$env{HOME}/dev/vs/$ms{projectDirName}"
+              }
+            }
         },
         {
             "name": "debug",
             "hidden": true,
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "DEBUG": "TRUE"
+                "CMAKE_BUILD_TYPE": "Debug"
             },
             "environment": {
                 "DEBUG": "1"
@@ -30,7 +34,9 @@
             }
         },
         {
-            "inherits": ["default"],
+            "inherits": [
+                "default"
+            ],
             "name": "linux",
             "hidden": true,
             "generator": "Unix Makefiles",
@@ -44,12 +50,18 @@
             }
         },
         {
-            "inherits": ["linux", "debug"],
+            "inherits": [
+                "linux",
+                "debug"
+            ],
             "name": "linux-debug",
             "displayName": "Debug"
         },
         {
-            "inherits": ["linux", "release"],
+            "inherits": [
+                "linux",
+                "release"
+            ],
             "name": "linux-release",
             "displayName": "Release"
         }

@@ -116,7 +116,7 @@ int init_egl_ctx(Display* display, Window& window, EGLDisplay& out_egl_display,
     eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context);
 
     /* Print some info */
-#ifdef DEBUG
+#if DEBUG
     printf("EGL > Client APIs: %s\n",
            eglQueryString(egl_display, EGL_CLIENT_APIS));
     printf("EGL >      Vendor: %s\n", eglQueryString(egl_display, EGL_VENDOR));

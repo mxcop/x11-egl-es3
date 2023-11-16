@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include <stdio.h>
+#include <GLES2/gl2.h>
 
 #include "window/x11.h"
 #include "window/egl.h"
@@ -20,13 +21,12 @@ int GameWindow::init(int w, int h, const char* title) {
         printf("Error creating EGL context.\n");
         return 0;
     }
+
     open = true;
     return 1;
 }
 
-int GameWindow::vsync(bool yes) {
-    return egl_vsync(egl_display, yes);
-}
+int GameWindow::vsync(bool yes) { return egl_vsync(egl_display, yes); }
 
 void GameWindow::swap_buffers() const {
     eglSwapBuffers(egl_display, egl_surface);
@@ -35,7 +35,7 @@ void GameWindow::swap_buffers() const {
 void GameWindow::size(int& w, int& h) const {
     XWindowAttributes gwa;
     XGetWindowAttributes(x_display, x_win, &gwa);
-    
+
     w = gwa.width;
     h = gwa.height;
 }

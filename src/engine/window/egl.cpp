@@ -4,6 +4,7 @@
 
 #include <X11/Xlib.h>
 #include <EGL/egl.h>
+#include <GLES2/gl2.h>
 
 int egl_init(Display* display, Window& window, EGLDisplay& out_egl_display,
              EGLSurface& out_egl_surface, EGLContext& out_egl_context) {
@@ -23,27 +24,24 @@ int egl_init(Display* display, Window& window, EGLDisplay& out_egl_display,
         printf("Unable to initialize EGL.\n");
         return 0;
     }
-    printf("Initialized EGL version %d.%d\n", egl_version_major,
-           egl_version_minor);
 
-    EGLint egl_config_constraints[] = {EGL_RED_SIZE,
-                                       8,
-                                       EGL_GREEN_SIZE,
-                                       8,
-                                       EGL_BLUE_SIZE,
-                                       8,
-                                       EGL_ALPHA_SIZE,
-                                       0,
-                                       EGL_RENDERABLE_TYPE,
-                                       EGL_OPENGL_ES3_BIT,
-                                       EGL_CONFIG_CAVEAT,
-                                       EGL_NONE,
-                                       EGL_NONE};
+    EGLint cfg_const[] = {EGL_RED_SIZE,
+                          8,
+                          EGL_GREEN_SIZE,
+                          8,
+                          EGL_BLUE_SIZE,
+                          8,
+                          EGL_ALPHA_SIZE,
+                          0,
+                          EGL_RENDERABLE_TYPE,
+                          EGL_OPENGL_ES3_BIT, /* <- GLES 3 */
+                          EGL_CONFIG_CAVEAT,
+                          EGL_NONE,
+                          EGL_NONE};
 
     EGLConfig egl_conf;
     EGLint num_config;
-    if (!eglChooseConfig(egl_display, egl_config_constraints, &egl_conf, 1,
-                         &num_config)) {
+    if (!eglChooseConfig(egl_display, cfg_const, &egl_conf, 1, &num_config)) {
         printf("Failed to choose config. (%d)\n", eglGetError());
         return 0;
     }
@@ -69,14 +67,10 @@ int egl_init(Display* display, Window& window, EGLDisplay& out_egl_display,
 
     eglMakeCurrent(egl_display, egl_surface, egl_surface, egl_context);
 
-    /* Print some info */
 #if DEBUG
-    printf("EGL > Client APIs: %s\n",
-           eglQueryString(egl_display, EGL_CLIENT_APIS));
-    printf("EGL >      Vendor: %s\n", eglQueryString(egl_display, EGL_VENDOR));
-    printf("EGL >     Version: %s\n", eglQueryString(egl_display, EGL_VERSION));
-    // printf("EGL - Extensions: \n%s\n", eglQueryString(egl_display,
-    // EGL_EXTENSIONS));
+    /* Print versions */
+    printf("EGL %s ~ %s\n", eglQueryString(egl_display, EGL_VERSION),
+           glGetString(GL_VERSION));
 #endif
 
     {

@@ -1,7 +1,6 @@
 #include "x11.h"
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include <libs.h>
 
 Window init_x11_window(Display* display, int x, int y, int w, int h,
                        const char* title) {

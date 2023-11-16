@@ -5,7 +5,7 @@
 
 #include <GLES2/gl2.h>
 
-#include "engine/window.h"
+#include "window/window.h"
 
 double get_time() {
     struct timeval tv;

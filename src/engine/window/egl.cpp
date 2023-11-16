@@ -2,9 +2,7 @@
 
 #include <stdio.h>
 
-#include <X11/Xlib.h>
-#include <EGL/egl.h>
-#include <GLES2/gl2.h>
+#include <libs.h>
 
 int egl_init(Display* display, Window& window, EGLDisplay& out_egl_display,
              EGLSurface& out_egl_surface, EGLContext& out_egl_context) {

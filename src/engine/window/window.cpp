@@ -1,10 +1,11 @@
 #include "window.h"
 
 #include <stdio.h>
-#include <GLES2/gl2.h>
 
-#include "window/x11.h"
-#include "window/egl.h"
+#include <libs.h>
+
+#include "x11.h"
+#include "egl.h"
 
 int GameWindow::init(int w, int h, const char* title) {
     /* Get X11 display */

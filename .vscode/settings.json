@@ -5,5 +5,8 @@
         "configurePreset": {
             "statusBarVisibility": "visible"
         }
+    },
+    "files.associations": {
+        "iosfwd": "cpp"
     }
 }

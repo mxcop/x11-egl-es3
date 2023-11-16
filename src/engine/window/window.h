@@ -1,16 +1,18 @@
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xutil.h>
+#pragma once
 
-#include <EGL/egl.h>
-
+/**
+ * @brief Abstract window object.
+ */
 struct GameWindow {
+    /* X11 */
     Window x_win = 0;
     Display* x_display = nullptr;
 
+    /* EGL */
     EGLDisplay egl_display = nullptr;
     EGLSurface egl_surface = nullptr;
     EGLContext egl_context = nullptr;
+
     bool open = false;
 
     GameWindow() = default;

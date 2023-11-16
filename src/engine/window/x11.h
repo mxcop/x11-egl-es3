@@ -1,4 +1,4 @@
-#include <X11/Xlib.h>
+#pragma once
 
 /**
  * @brief Initialize an X11 window.

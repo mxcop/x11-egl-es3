@@ -1,5 +1,4 @@
-#include <X11/Xlib.h>
-#include <EGL/egl.h>
+#pragma once
 
 /**
  * @brief (Attempt) to initialize the EGL context.

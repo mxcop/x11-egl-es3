@@ -24,13 +24,15 @@ int egl_init(Display* display, Window& window, EGLDisplay& out_egl_display,
     }
 
     EGLint cfg_const[] = {EGL_RED_SIZE,
-                          8,
+                          8, /* 8-bit red buffer */
                           EGL_GREEN_SIZE,
-                          8,
+                          8, /* 8-bit green buffer */
                           EGL_BLUE_SIZE,
-                          8,
+                          8, /* 8-bit blue buffer */
                           EGL_ALPHA_SIZE,
-                          0,
+                          0, /* !NO alpha buffer */
+                          EGL_DEPTH_SIZE,
+                          8, /* 8-bit depth buffer */
                           EGL_RENDERABLE_TYPE,
                           EGL_OPENGL_ES3_BIT, /* <- GLES 3 */
                           EGL_CONFIG_CAVEAT,

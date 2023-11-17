@@ -3,34 +3,40 @@
 #include <libs.h>
 
 const float cv_vertices[] = {
-    -0.5f, -0.5f, -0.5f,  // A 0
-    0.5f,  -0.5f, -0.5f,  // B 1
-    0.5f,  0.5f,  -0.5f,  // C 2
-    -0.5f, 0.5f,  -0.5f,  // D 3
-    -0.5f, -0.5f, 0.5f,   // E 4
-    0.5f,  -0.5f, 0.5f,   // F 5
-    0.5f,  0.5f,  0.5f,   // G 6
-    -0.5f, 0.5f,  0.5f,   // H 7
+    -0.5, -0.5,  0.5, //0
+    0.5, -0.5,  0.5, //1
+    -0.5,  0.5,  0.5, //2
+    0.5,  0.5,  0.5, //3
+    -0.5, -0.5, -0.5, //4
+    0.5, -0.5, -0.5, //5
+    -0.5,  0.5, -0.5, //6
+    0.5,  0.5, -0.5  //7
 };
 
 const unsigned char cv_indices[] = {
-    0, 3, 2,  //
-    2, 1, 0,  //
+    //Top
+    2, 6, 7,
+    2, 3, 7,
 
-    4, 5, 6,  //
-    6, 7, 4,  //
+    //Bottom
+    0, 4, 5,
+    0, 1, 5,
 
-    7, 3, 0,  //
-    0, 4, 7,  //
+    //Left
+    0, 2, 6,
+    0, 4, 6,
 
-    1, 2, 6,  //
-    6, 5, 1,  //
+    //Right
+    1, 3, 7,
+    1, 5, 7,
 
-    0, 1, 5,  //
-    5, 4, 0,  //
+    //Front
+    0, 2, 3,
+    0, 1, 3,
 
-    2, 3, 7,  //
-    7, 6, 2,  //
+    //Back
+    4, 6, 7,
+    4, 5, 7
 };
 
 constexpr float g_vertex_buffer_data[] = {
@@ -101,6 +107,8 @@ void CuboidVolumeRenderer::draw(const CuboidVolume& cv,
 
     /* Upload the matrix */
     shader.use();
+    shader.set_mat4("model", model);
+    shader.set_vec3f("camera_forward", glm::vec3(0.0f, 0.0f, -1.0f));
     shader.set_mat4("pvm", pvm);
 
     /* Draw the volume */
@@ -109,6 +117,10 @@ void CuboidVolumeRenderer::draw(const CuboidVolume& cv,
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+void CuboidVolume::set_rotation(glm::vec3 rot) {
+    this->rot = rot;
 }
 
 CuboidVolumeRenderer::~CuboidVolumeRenderer() {

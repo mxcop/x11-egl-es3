@@ -17,6 +17,8 @@ struct CuboidVolume {
         : pos(pos), size(size), rot(rot){};
     CuboidVolume(glm::vec3 pos, glm::ivec3 size, glm::vec3 rot)
         : pos(pos), size(size), rot(rot){};
+
+    void set_rotation(glm::vec3 rot);
 };
 
 /**

@@ -19,6 +19,11 @@ int init() {
 }
 
 void tick(double dt) {
+    static double time = 0.0;
+    time += dt;
+
+    volume.set_rotation(glm::vec3(time));
+
     /* Create the camera view matrix */
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 pv = proj * view;

@@ -6,9 +6,10 @@
 
 /* GLM header */
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 /* OpenGL ES header */
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 
 /* EGL header */
 #include <EGL/egl.h>

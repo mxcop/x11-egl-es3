@@ -6,6 +6,7 @@
 #include <GLES2/gl2.h>
 
 #include "window/window.h"
+#include "game/game.h"
 
 double get_time() {
     struct timeval tv;
@@ -49,6 +50,8 @@ int main(int argc, char** argv) {
         glViewport(0, 0, w, h);
     }
 
+    if (!init()) return -1; /* Game init */
+
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     double time = get_time();
 
@@ -62,7 +65,7 @@ int main(int argc, char** argv) {
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        /* Do stuff here :) */
+        tick(dt); /* Game tick */
 
         win.swap_buffers();
     }

@@ -124,8 +124,16 @@ GLuint Shader::load(const char* vert_src_path, const char* frag_src_path) {
 
     /* Dump file contents into strings */
     std::string vert_src, frag_src;
-    vert_file >> vert_src;
-    frag_file >> frag_src;
+    vert_file.seekg(0, std::ios::end);
+    vert_src.reserve(vert_file.tellg());
+    vert_file.seekg(0, std::ios::beg);
+    vert_src.assign((std::istreambuf_iterator<char>(vert_file)),
+            std::istreambuf_iterator<char>());
+    frag_file.seekg(0, std::ios::end);
+    frag_src.reserve(frag_file.tellg());
+    frag_file.seekg(0, std::ios::beg);
+    frag_src.assign((std::istreambuf_iterator<char>(frag_file)),
+            std::istreambuf_iterator<char>());
 
     handle = compile(vert_src.c_str(), frag_src.c_str());
     return handle;

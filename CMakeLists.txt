@@ -11,6 +11,13 @@ set_target_properties(main PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 # Add DEBUG compiler macro
 target_compile_definitions(main PRIVATE "DEBUG=$<CONFIG:Debug>")
 
+# Post build command (copies the asset files)
+add_custom_command(TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    ${PROJECT_SOURCE_DIR}/assets 
+    ${PROJECT_BINARY_DIR}/assets
+)
+
 # Includes
 target_include_directories(main PRIVATE "./inc/" "./src/" "./src/engine/")
 target_precompile_headers(main PRIVATE "./inc/libs.h")

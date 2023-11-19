@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
 
     /* Create the game window */
     GameWindow win = GameWindow();
-    assert(win.init(800, 600, "Hello, world!"));
+    assert(win.init(800, 450, "Hello, world!"));
     win.vsync(false);
 
     /* Start input thread */
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glDepthMask(true);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0745f, 0.0784f, 0.0784f, 1.0f);
 
     double time = get_time();
 

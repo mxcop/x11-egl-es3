@@ -2,36 +2,20 @@
 
 #include <vector>
 
-#include "shader.h"
-
-/**
- * @brief Data representing a voxel bounding volume.
- */
-struct VoxelVolume {
-    glm::vec3 pos;
-    glm::ivec3 size;
-    glm::quat rot;
-
-    VoxelVolume() = default;
-    VoxelVolume(glm::vec3 pos, glm::ivec3 size, glm::quat rot)
-        : pos(pos), size(size), rot(rot){};
-    VoxelVolume(glm::vec3 pos, glm::ivec3 size, glm::vec3 rot)
-        : pos(pos), size(size), rot(rot){};
-
-    void set_rotation(glm::vec3 rot);
-};
+#include "../shader.h"
+#include "volume.h"
 
 /**
  * @brief Used for rendering a large number of voxel volumes.
  */
-class VoxelVolumeRenderer {
+class VoxelRenderer {
     /* Buffer handles */
     GLuint vbo = 0, vao = 0, ebo = 0;
     Shader shader;
 
 public:
-    VoxelVolumeRenderer() = default;
-    ~VoxelVolumeRenderer();
+    VoxelRenderer() = default;
+    ~VoxelRenderer();
 
     void init();
 
@@ -50,7 +34,7 @@ public:
      * @param vv The voxel volume data.
      * @param pv The view and projection matrices.
      */
-    void draw_nobind(const VoxelVolume& vv, const glm::mat4& pv) const;
+    void draw_nobind(const glm::vec3& camera_pos, const VoxelVolume& vv, const glm::mat4& pv) const;
 
     /**
      * @brief Draw a voxel volume.
@@ -58,7 +42,7 @@ public:
      * @param vv The voxel volume data.
      * @param pv The view and projection matrices.
      */
-    void draw(const VoxelVolume& vv, const glm::mat4& pv) const;
+    void draw(const glm::vec3& camera_pos, const VoxelVolume& vv, const glm::mat4& pv) const;
 
     /**
      * @brief Draw all voxel volumes in a vector.
@@ -66,5 +50,5 @@ public:
      * @param vvv The voxel volume data vector.
      * @param pv The view and projection matrices.
      */
-    void draw_all(const std::vector<VoxelVolume>& vvv, const glm::mat4& pv) const;
+    void draw_all(const glm::vec3& camera_pos, const std::vector<VoxelVolume>& vvv, const glm::mat4& pv) const;
 };

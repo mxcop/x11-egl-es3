@@ -45,6 +45,7 @@ void VoxelVolume::gen_mipmap() {
         {
             for (int x = 0; x < data.width; x+=2)
             {
+                // TODO: Clean up this cursed goofy ah code.
                 unsigned int sum = 0u;
                 unsigned int div = 1u;
                 {

@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <GLES2/gl2.h>
+#include <X11/extensions/Xfixes.h>
 
 #include "window/window.h"
 #include "game/game.h"
@@ -29,6 +30,69 @@ void input(GameWindow* win) {
             win->open = false;
             return;
         }
+
+        // XGrabPointer(win->x_display, win->x_win, True,
+        //          ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+        //          GrabModeAsync, GrabModeAsync,
+        //          win->x_win,
+        //          None,
+        //          CurrentTime);
+
+        switch (x_ev.type) {
+            case KeyPress:
+                /* Exit on escape */
+                if (XLookupKeysym(&x_ev.xkey, 0) == XK_Escape) {
+                    win->open = false;
+                    return;
+                }
+                if (XLookupKeysym(&x_ev.xkey, 0) == XK_space) {
+                    printf("The space bar was pressed.\n");
+                }
+                break;
+            case KeyRelease:
+                if (XLookupKeysym(&x_ev.xkey, 0) == XK_space) {
+                    printf("The space bar was released.\n");
+                }
+                break;
+            case ButtonPress:
+                if (x_ev.xbutton.button == Button1) {
+                    printf("The left mouse button was pressed.\n");
+                }
+                break;
+            case ButtonRelease:
+                if (x_ev.xbutton.button == Button1) {
+                    printf("The left mouse button was released.\n");
+                }
+                break;
+            case MotionNotify:
+                // TODO: change 400, 300 to screen width and height *.5
+                //int dx = 400 - x_ev.xmotion.x, dy = 300 - x_ev.xmotion.y;
+                //XWarpPointer(win->x_display, None, win->x_win, 0, 0, 0, 0, 400, 300);
+                //XSetInputFocus(win->x_display, win->x_win, PointerRoot, CurrentTime);
+                break;
+            // case FocusIn:
+            //     {
+            //         int screen = DefaultScreen(win->x_display);
+            //         Window root = RootWindow(win->x_display, screen);
+            //         XFixesHideCursor(win->x_display, root);
+            //         XSync(win->x_display, True);
+            //         XFlush(win->x_display);
+            //     }
+
+            //     printf("Hide cursor.\n");
+            //     break;
+            // case FocusOut:
+            //     {
+            //         int screen = DefaultScreen(win->x_display);
+            //         Window root = RootWindow(win->x_display, screen);
+            //         XFixesShowCursor(win->x_display, root);
+            //         XSync(win->x_display, False);
+            //         XFlush(win->x_display);
+            //     }
+
+            //     printf("Show cursor.\n");
+            //     break;
+        }
     }
 }
 
@@ -45,7 +109,7 @@ int main(int argc, char** argv) {
     std::thread input_th(input, &win);
 
     { /* Set viewport dimension */
-        int w, h; 
+        int w, h;
         win.size(w, h);
         glViewport(0, 0, w, h);
     }

@@ -5,33 +5,33 @@
 #include "shader.h"
 
 /**
- * @brief Data representing a cuboid bounding volume.
+ * @brief Data representing a voxel bounding volume.
  */
-struct CuboidVolume {
+struct VoxelVolume {
     glm::vec3 pos;
     glm::ivec3 size;
     glm::quat rot;
 
-    CuboidVolume() = default;
-    CuboidVolume(glm::vec3 pos, glm::ivec3 size, glm::quat rot)
+    VoxelVolume() = default;
+    VoxelVolume(glm::vec3 pos, glm::ivec3 size, glm::quat rot)
         : pos(pos), size(size), rot(rot){};
-    CuboidVolume(glm::vec3 pos, glm::ivec3 size, glm::vec3 rot)
+    VoxelVolume(glm::vec3 pos, glm::ivec3 size, glm::vec3 rot)
         : pos(pos), size(size), rot(rot){};
 
     void set_rotation(glm::vec3 rot);
 };
 
 /**
- * @brief Used for rendering a large number of cuboid volumes.
+ * @brief Used for rendering a large number of voxel volumes.
  */
-class CuboidVolumeRenderer {
+class VoxelVolumeRenderer {
     /* Buffer handles */
     GLuint vbo = 0, vao = 0, ebo = 0;
     Shader shader;
 
 public:
-    CuboidVolumeRenderer() = default;
-    ~CuboidVolumeRenderer();
+    VoxelVolumeRenderer() = default;
+    ~VoxelVolumeRenderer();
 
     void init();
 
@@ -45,10 +45,26 @@ public:
     int load(const char *vert_src_path, const char *frag_src_path);
 
     /**
-     * @brief Draw a cuboid volume.
+     * @brief Draw a voxel volume without binding and unbinding resources.
      * 
-     * @param cv The volume data.
+     * @param vv The voxel volume data.
      * @param pv The view and projection matrices.
      */
-    void draw(const CuboidVolume& cv, const glm::mat4& pv) const;
+    void draw_nobind(const VoxelVolume& vv, const glm::mat4& pv) const;
+
+    /**
+     * @brief Draw a voxel volume.
+     * 
+     * @param vv The voxel volume data.
+     * @param pv The view and projection matrices.
+     */
+    void draw(const VoxelVolume& vv, const glm::mat4& pv) const;
+
+    /**
+     * @brief Draw all voxel volumes in a vector.
+     * 
+     * @param vvv The voxel volume data vector.
+     * @param pv The view and projection matrices.
+     */
+    void draw_all(const std::vector<VoxelVolume>& vvv, const glm::mat4& pv) const;
 };

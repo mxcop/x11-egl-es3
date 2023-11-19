@@ -12,7 +12,7 @@ set_target_properties(main PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 target_compile_definitions(main PRIVATE "DEBUG=$<CONFIG:Debug>")
 
 # Post build command (copies the asset files)
-add_custom_command(TARGET main POST_BUILD
+add_custom_command(TARGET main PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory 
     ${PROJECT_SOURCE_DIR}/assets 
     ${PROJECT_BINARY_DIR}/assets
@@ -25,6 +25,7 @@ target_precompile_headers(main PRIVATE "./inc/libs.h")
 # Shared libraries
 target_link_libraries(main 
     X11    # Window Compositor API
+    Xfixes # Extension for X11 (for hiding cursor)
     EGL    # Context API
     GLESv2 # OpenGL ES API
 )

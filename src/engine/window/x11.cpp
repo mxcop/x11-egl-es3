@@ -8,7 +8,10 @@ Window init_x11_window(Display* display, int x, int y, int w, int h,
     Window root_win = DefaultRootWindow(display);
 
     XSetWindowAttributes swa;
-    swa.event_mask = ExposureMask | ButtonPressMask | KeyPressMask;
+    /* We're interested in these input events */
+    swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
+                     ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
+                     FocusChangeMask;
 
     /* Create our window */
     Window x_win =

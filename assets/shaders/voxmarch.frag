@@ -51,11 +51,11 @@ bool traverse(in vec3 ro, in vec3 rd, in vec3 ird) {
     vec3 sd = ((idx - vp) + (srd * .5) + .5) * ird;
     
     for (int i = 0; i < MAX_STEPS; ++i) {
+        // TODO: instead of a while loop, just step through in one go.
         /* Skip if 2x2 voxel is empty */
         while(fetch_voxel(idx, 1.0) == 0.0) {
             /* Compute the step mask */ 
             vec3 mask = step(sd.xyz, sd.yzx) * step(sd.xyz, sd.zxy);
-            // vec3 mask = vec3(lessThanEqual(sd.xyz, min(sd.yzx, sd.zxy)));
 
             /* Step to the next voxel */ 
             sd += mask * srd * ird;
@@ -91,7 +91,7 @@ bool traverse(in vec3 ro, in vec3 rd, in vec3 ird) {
 
 void main() {
     /* Ray origin, direction, and direction as fraction */ 
-	vec3 ray_dir = normalize(frag_dir);
+	vec3 ray_dir = frag_dir;
 	vec3 ray_invdir = 1. / ray_dir;
 	vec3 ray_origin = frag_origin;
     

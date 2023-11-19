@@ -20,5 +20,5 @@ void main()
 
     /* Compute ray origin and direction */
 	frag_origin = camera_local;
-	frag_dir = (pos - camera_local);
+	frag_dir = normalize(pos - camera_local);
 }

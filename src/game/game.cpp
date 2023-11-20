@@ -45,7 +45,7 @@ void tick(double dt) {
 
     camera_pos.x = sin(time) * 10.0f + 5.0f;
     camera_pos.z = cos(time) * 10.0f + 5.0f;
-
+    
     /* Sort the voxel volumes front to back (for avoiding overdraw) */
     if (sort_timer > 1.0 / 20.0) {
         std::sort(volumes.begin(), volumes.end(), [](VoxelVolume& a, const VoxelVolume& b){

@@ -24,10 +24,11 @@ target_precompile_headers(main PRIVATE "./inc/libs.h")
 
 # Shared libraries
 target_link_libraries(main 
-    X11    # Window Compositor API
-    Xfixes # Extension for X11 (for hiding cursor)
-    EGL    # Context API
-    GLESv2 # OpenGL ES API
+    X11     # Window Compositor API
+    Xfixes  # Extension for X11 (for hiding cursor)
+    EGL     # Context API
+    GLESv2  # OpenGL ES API
+    pthread # Multi-threading
 )
 
 # Glob all source files
